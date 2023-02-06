@@ -1,0 +1,31 @@
+version: '3.4'
+
+networks:
+  csvimportsitenet:
+
+services:
+  csvimportdb:
+    container_name: csv-import-db-container
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+      - 8002:1433
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=1StrongPassword234@
+    networks:
+      - csvimportsitenet
+
+  csvimportsite:
+    container_name: csv-import-site-container
+    image: nikitaleosh/csvimportsite
+    ports: 
+      - 8001:80
+    depends_on: 
+      - csvimportdb
+    environment:
+      - DB_HOST=csvimportdb
+      - DB_NAME=CsvImpostSiteDb
+      - DB_SA_PASSWORD=1StrongPassword234@
+      - MSSQL_PID=Standart
+    networks:
+      - csvimportsitenet

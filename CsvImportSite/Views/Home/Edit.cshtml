@@ -1,0 +1,78 @@
+﻿@model Employee;
+<hr />
+<h5>Edit employee's record</h5>
+<hr />
+<body>
+	<div class="card col-md-6 col-sm-12">
+		<form method="post" asp-action="Edit">
+			<ul class="list-unstyled m-2">
+				<li class="my-2">
+					<label class="text-dark mx-auto" asp-for="Payroll_Number">Payroll number(payroll number can not be changed here)</label>
+					<input type="text" readonly class="form-control" asp-for="Payroll_Number" placeholder="@Model.Payroll_Number" />
+					<span class="text-danger" asp-validation-for="Payroll_Number"></span>
+				</li>
+				<li class="my-2">
+					<label class="mx-auto" asp-for="Forenames">First name</label>
+					<input type="text" class="form-control" asp-for="Forenames" placeholder="@Model.Forenames" />
+					<span class="text-danger" asp-validation-for="Forenames"></span>
+				</li>
+				<li class="my-2">
+					<label class="mx-auto" asp-for="Surname">Last name</label>
+					<input type="text" class="form-control" asp-for="Surname" placeholder="@Model.Surname" />
+					<span class="text-danger" asp-validation-for="Surname"></span>
+				</li>
+				<li class="my-2">
+					<label class="mx-auto" asp-for="Date_of_Birth">Date of birth</label>
+					<input type="date" class="form-control" asp-for="Date_of_Birth" placeholder="@Model.Date_of_Birth" />
+					<span class="text-danger" asp-validation-for="Date_of_Birth"></span>
+				</li>
+				<li class="my-2">
+					<label class="mx-auto" asp-for="Telephone">Telephone</label>
+					<input type="tel" class="form-control" asp-for="Telephone" placeholder="@Model.Telephone" />
+					<span class="text-danger" asp-validation-for="Telephone"></span>
+				</li>
+				<li class="my-2">
+					<label class="mx-auto" asp-for="Mobile">Mobile</label>
+					<input type="tel" class="form-control" asp-for="Mobile" placeholder="@Model.Mobile" />
+					<span class="text-danger" asp-validation-for="Mobile"></span>
+				</li>
+				<li class="my-2">
+					<label class="mx-auto" asp-for="Address">Address</label>
+					<input type="text" class="form-control" asp-for="Address" placeholder="@Model.Address" />
+					<span class="text-danger" asp-validation-for="Address"></span>
+				</li>
+				<li class="my-2">
+					<label class="mx-auto" asp-for="Address_2">Address 2</label>
+					<input type="text" class="form-control" asp-for="Address_2" placeholder="@Model.Address_2" />
+					<span class="text-danger" asp-validation-for="Address_2"></span>
+				</li>
+				<li class="my-2">
+					<label class="mx-auto" asp-for="Postcode">Post code</label>
+					<input type="text" class="form-control" asp-for="Postcode" placeholder="@Model.Postcode" />
+					<span class="text-danger" asp-validation-for="Postcode"></span>
+				</li>
+				<li class="my-2">
+					<label class="mx-auto" asp-for="EMail_Home">Email</label>
+					<input type="email" class="form-control" asp-for="EMail_Home" placeholder="@Model.EMail_Home" />
+					<span class="text-danger" asp-validation-for="EMail_Home"></span>
+				</li>
+				<li class="my-2">
+					<label class="mx-auto" asp-for="Start_Date">Start date</label>
+					<input readonly type="date" class="form-control" asp-for="Start_Date" placeholder="@Model.Start_Date" />
+					<span class="text-danger" asp-validation-for="Start_Date"></span>
+				</li>
+			</ul>
+			<div class="btn-group m-3">
+				<button class="btn btn-outline-primary" type="submit">Apply changes</button>
+				<a class="btn btn-outline-secondary" asp-action="ChangePayrollNumber" asp-route-id="@Model.Payroll_Number">Change payroll number</a>
+				<a class="btn btn-outline-secondary" asp-action="Index">Back to list</a>
+			</div>
+		</form>
+	</div>
+		@section Scripts{
+
+			@{
+				<partial name="_ValidationScriptsPartial" />
+			}
+		}
+</body>

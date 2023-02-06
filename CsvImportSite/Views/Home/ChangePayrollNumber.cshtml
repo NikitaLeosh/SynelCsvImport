@@ -1,0 +1,49 @@
+﻿@using CsvImportSite.ViewModels;
+@model ChangePayrollNumberViewModel;
+<hr />
+<h5>Change payroll number</h5>
+@if (TempData["error"] != null)
+{
+	<div class="alert alert-danger my-3">@TempData["error"]</div>
+}
+@if (TempData["success"] != null)
+{
+	<div class="alert alert-success my-3">@TempData["success"]</div>
+}
+<hr />
+<body>
+	<div class="card col-md-6 col-sm-12">
+		<form method="post" asp-action="ChangePayrollNumber">
+			<ul class="list-unstyled m-2">
+				<li class="my-2">
+					<label class="text-dark mx-auto" asp-for="Payroll_Number">Old ayroll number</label>
+					<input type="text" readonly class="form-control" asp-for="Payroll_Number" placeholder="@Model.Payroll_Number" />
+				</li>
+				<li class="my-2">
+					<label class="mx-auto" asp-for="Forenames">First name</label>
+					<input readonly type="text" class="form-control" asp-for="Forenames" placeholder="@Model.Forenames" />
+				</li>
+				<li class="my-2">
+					<label class="mx-auto" asp-for="Surname">Last name</label>
+					<input readonly type="text" class="form-control" asp-for="Surname" placeholder="@Model.Surname" />
+				</li>
+				<li class="my-2">
+					<label class="text-dark text-decoration-underline mx-auto" asp-for="Payroll_Number">New payroll number</label>
+					<input type="text" class="form-control border-primary" asp-for="NewPayroll_Number" placeholder="@Model.Payroll_Number" />
+					<span class="text-danger" asp-validation-for="NewPayroll_Number"></span>
+				</li>
+			</ul>
+			<div class="btn-group">
+				<button class="btn btn-outline-danger" type="submit">Apply changes</button>
+				<a class="btn btn-outline-secondary" asp-action="Edit" asp-route-id="@Model.Payroll_Number">Back to "edit" page</a>
+			</div>
+		</form>
+	</div>
+	@section Scripts{
+
+		@{
+			<partial name="_ValidationScriptsPartial" />
+		}
+	}
+
+</body>
