@@ -1,7 +1,7 @@
 ﻿using CsvHelper.Configuration;
-using CsvImportSite.Models;
+using CsvImportSiteJS.Models;
 
-namespace CsvImportSite.Configuration
+namespace CsvImportSiteJS.Configuration
 {
 	public class CsvEmployeeMap : ClassMap<Employee>
 	{

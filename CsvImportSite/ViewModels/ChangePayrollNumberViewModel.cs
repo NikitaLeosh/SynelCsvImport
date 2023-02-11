@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CsvImportSite.ViewModels
+namespace CsvImportSiteJS.ViewModels
 {
 	public class ChangePayrollNumberViewModel
 	{

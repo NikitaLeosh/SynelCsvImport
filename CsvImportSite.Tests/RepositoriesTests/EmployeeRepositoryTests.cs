@@ -1,6 +1,6 @@
-﻿using CsvImportSite.Data;
-using CsvImportSite.Models;
-using CsvImportSite.Repositories;
+﻿using CsvImportSiteJS.Data;
+using CsvImportSiteJS.Models;
+using CsvImportSiteJS.Repositories;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 
-namespace CsvImportSite.Tests.RepositoriesTests
+namespace CsvImportSiteJS.Tests.RepositoriesTests
 {
 	public class EmployeeRepositoryTests
 	{

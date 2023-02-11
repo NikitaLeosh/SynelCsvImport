@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
-using CsvImportSite.Models;
-using CsvImportSite.ViewModels;
+using CsvImportSiteJS.Models;
+using CsvImportSiteJS.ViewModels;
 using Microsoft.AspNetCore.Routing.Constraints;
 
-namespace CsvImportSite.Configuration
+namespace CsvImportSiteJS.Configuration
 {
 	public class AutoMapperProfiles : Profile
 	{

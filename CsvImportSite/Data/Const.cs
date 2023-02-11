@@ -1,4 +1,4 @@
-﻿namespace CsvImportSite.Data
+﻿namespace CsvImportSiteJS.Data
 {
 	public class Const
 	{

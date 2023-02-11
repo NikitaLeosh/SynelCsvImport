@@ -1,34 +1,34 @@
 version: '3.4'
 
 networks:
-  csvimportsitenet:
+  csvimportsitjsenet:
 
 services:
-  csvimportdb:
-    container_name: csv-import-db
+  csvimportjsdb:
+    container_name: csv-import-js-db
     image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
       - 8002:1433
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=1StrongPassword234@
+      - MSSQL_SA_PASSWORD=1StrongPassword234@
     networks:
-      - csvimportsitenet
+      - csvimportsitjsenet
 
-  csvimportsite:
-    container_name: csv-import-site
-    image: ${DOCKER_REGISTRY-}csvimportsite
+  csvimportsitejs:
+    container_name: csv-import-site-js
+    image: ${DOCKER_REGISTRY-}csvimportsitejs
     build:
       context: .
       dockerfile: CsvImportSite/Dockerfile
     ports: 
       - 8001:80
     depends_on: 
-      - csvimportdb
+      - csvimportjsdb
     environment:
-      - DB_HOST=csvimportdb
-      - DB_NAME=CsvImpostSiteDb
-      - DB_SA_PASSWORD=1StrongPassword234@
+      - DB_HOST=csvimportjsdb
+      - DB_NAME=CsvImpostSitejsDb
+      - MSSQL_SA_PASSWORD=1StrongPassword234@
       - MSSQL_PID=Standart
     networks:
-      - csvimportsitenet
+      - csvimportsitjsenet

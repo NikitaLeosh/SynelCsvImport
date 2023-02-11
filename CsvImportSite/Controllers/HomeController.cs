@@ -1,28 +1,27 @@
-﻿using CsvImportSite.Interfaces;
-using CsvImportSite.Models;
-using CsvImportSite.ViewModels;
+﻿using CsvImportSiteJS.Interfaces;
+using CsvImportSiteJS.Models;
+using CsvImportSiteJS.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using AutoMapper;
 using System.Text.RegularExpressions;
 
-namespace CsvImportSite.Controllers
+namespace CsvImportSiteJS.Controllers
 {
 	public class HomeController : Controller
 	{
-		private readonly ILogger<HomeController> _logger;
 		private readonly IEmployeeRepository _employeeRepository;
 		private readonly ICsvParsingService _csvParser;
 		private readonly IMapper _mapper;
 
-		public HomeController(ILogger<HomeController> logger, IEmployeeRepository repository, ICsvParsingService csvParser, IMapper mapper)
+		public HomeController(IEmployeeRepository repository, ICsvParsingService csvParser, IMapper mapper)
 		{
 			_csvParser = csvParser;
-			_logger = logger;
 			_employeeRepository = repository;
 			_mapper = mapper;
 		}
+		//GET: /Home/Index
 		[HttpGet]
 		public async Task<IActionResult> Index()
 		{
@@ -32,7 +31,9 @@ namespace CsvImportSite.Controllers
 			};
 			return View(indexViewModel);
 		}
+		//POST: Home/Index
 		[HttpPost]
+		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Index(IndexViewModel indexViewModel)
 		{
 			if (indexViewModel == null) { return NotFound(); }
@@ -65,15 +66,16 @@ namespace CsvImportSite.Controllers
 			}
 			return RedirectToAction("Index");
 		}
-
+		//GET: /Home/Edit/{Payroll number}
 		public async Task<IActionResult> Edit(string id)
 		{
 			var employeeToEdit = await _employeeRepository.GetEmployeeByPayrollNumberAsyncNoTracking(id);
 			if (employeeToEdit == null) return NotFound();
 			return View(employeeToEdit);
 		}
-
+		//POST: /Home/Edit/{Payroll number}
 		[HttpPost]
+		[ValidateAntiForgeryToken]
 		public IActionResult Edit(string id, Employee employeeToEdit)
 		{
 			try
@@ -95,9 +97,13 @@ namespace CsvImportSite.Controllers
 			var changePayrollVM = _mapper.Map<ChangePayrollNumberViewModel>(employee);
 			return View(changePayrollVM);
 		}
+		//POST: Home/ChangePayrollNumber/{PayrollNumber}
 		[HttpPost]
+		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> ChangePayrollNumber(ChangePayrollNumberViewModel changeNumberVM)
 		{
+			//Changing the key value requires deleting the record to replace it with a new one.
+			//To avoid inadvertant loss of data the changed record is added to the db prior to delete the old one. 
 			if (changeNumberVM.Payroll_Number == changeNumberVM.NewPayroll_Number)
 			{
 				ModelState.AddModelError("NewPayroll_Number", "New payroll number must differ from the old one.");
@@ -115,6 +121,31 @@ namespace CsvImportSite.Controllers
 				TempData["error"] = "Couldn't find the record to change number";
 				return View(changeNumberVM);
 			}
+			//Adding new variable with changed payroll number to avoid extra query to a database
+			Employee changedEmployee = new()
+			{
+				Payroll_Number = changeNumberVM.NewPayroll_Number,
+				Forenames = employee.Forenames,
+				Surname = employee.Surname,
+				Date_of_Birth = employee.Date_of_Birth,
+				Telephone = employee.Telephone,
+				Mobile = employee.Mobile,
+				Address = employee.Address,
+				Address_2 = employee.Address_2,
+				Postcode = employee.Postcode,
+				EMail_Home = employee.EMail_Home,
+				Start_Date = employee.Start_Date
+			};
+			try
+			{
+				await _employeeRepository.AddAsync(changedEmployee);
+			}
+			catch (Exception ex)
+			{
+				ModelState.AddModelError("AddError", "Error while adding the new numbered record");
+				TempData["error"] = ex.Message;
+				return View(changeNumberVM);
+			}
 			try
 			{
 				_employeeRepository.Delete(employee);
@@ -125,26 +156,32 @@ namespace CsvImportSite.Controllers
 				TempData["error"] = ex.Message;
 				return View(changeNumberVM);
 			}
-			employee.Payroll_Number = changeNumberVM.NewPayroll_Number;
-			try
-			{
-				await _employeeRepository.AddAsync(employee);
-				TempData["success"] = $"Payroll number of employee {changeNumberVM.Forenames} {changeNumberVM.Surname} successfully changed";
-			}
-			catch (Exception ex)
-			{
-				ModelState.AddModelError("AddError", "Error while adding the new numbered record");
-				TempData["error"] = ex.Message;
-				return View(changeNumberVM);
-			}
+			TempData["success"] = $"Payroll number of employee {changeNumberVM.Forenames} {changeNumberVM.Surname} successfully changed";
 			return RedirectToAction(nameof(Index));
 		}
 
-		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-		public IActionResult Error()
+		//POST: Home/Delete/{PayrollNumber}
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Delete(string id)
 		{
-			_logger.BeginScope(typeof(HomeController));
-			return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+			var employee = await _employeeRepository.GetEmployeeByPayrollNumberAsync(id);
+			if (employee == null)
+			{
+				TempData["error"] = "Employee to delete not found";
+				ModelState.AddModelError("DeleteError", "Employee to delete not found");
+				return RedirectToAction(nameof(Index));
+			}
+			try
+			{
+				_employeeRepository.Delete(employee);
+				TempData["success"] = $"Record of employee {employee.Forenames} {employee.Surname} has been deleted";
+			}
+			catch (Exception ex)
+			{
+				TempData["error"] = $"Could not delete the employee({ex.Message})";
+			}
+			return RedirectToAction(nameof(Index));
 		}
 	}
 }

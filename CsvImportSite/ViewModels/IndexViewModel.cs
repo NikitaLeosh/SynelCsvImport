@@ -1,7 +1,7 @@
-﻿using CsvImportSite.Models;
+﻿using CsvImportSiteJS.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace CsvImportSite.ViewModels
+namespace CsvImportSiteJS.ViewModels
 {
 	public class IndexViewModel
 	{

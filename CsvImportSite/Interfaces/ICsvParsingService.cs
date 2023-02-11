@@ -1,6 +1,6 @@
-﻿using CsvImportSite.Models;
+﻿using CsvImportSiteJS.Models;
 
-namespace CsvImportSite.Interfaces
+namespace CsvImportSiteJS.Interfaces
 {
 	public interface ICsvParsingService
 	{

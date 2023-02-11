@@ -1,8 +1,8 @@
-using CsvImportSite.Configuration;
-using CsvImportSite.Data;
-using CsvImportSite.Interfaces;
-using CsvImportSite.Repositories;
-using CsvImportSite.Services;
+using CsvImportSiteJS.Configuration;
+using CsvImportSiteJS.Data;
+using CsvImportSiteJS.Interfaces;
+using CsvImportSiteJS.Repositories;
+using CsvImportSiteJS.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +12,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<ICsvParsingService, CsvParsingService>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+//builder.Services.AddDbContext<ProjectDbContext>(options => options.UseSqlServer(
+//	builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddDbContext<ProjectDbContext>(options => options.UseSqlServer(
 	ProjectConnectionStringBuilder.connectionstring));
 

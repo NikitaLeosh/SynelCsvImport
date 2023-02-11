@@ -1,9 +1,9 @@
 using AutoMapper;
 using Castle.Core.Logging;
-using CsvImportSite.Controllers;
-using CsvImportSite.Interfaces;
-using CsvImportSite.Models;
-using CsvImportSite.ViewModels;
+using CsvImportSiteJS.Controllers;
+using CsvImportSiteJS.Interfaces;
+using CsvImportSiteJS.Models;
+using CsvImportSiteJS.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
@@ -13,11 +13,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
-namespace CsvImportSite.Tests.ControllerTests
+namespace CsvImportSiteJS.Tests.ControllerTests
 {
 	public class HomeControllerTests
 	{
-		private readonly ILogger<HomeController> _logger;
 		private readonly IEmployeeRepository _employeeRepository;
 		private readonly ICsvParsingService _csvParser;
 		private readonly ITempDataDictionary _tempData;
@@ -25,7 +24,6 @@ namespace CsvImportSite.Tests.ControllerTests
 
 		public HomeControllerTests()
 		{
-			_logger = A.Fake<ILogger<HomeController>>();
 			_employeeRepository = A.Fake<IEmployeeRepository>();
 			_csvParser = A.Fake<ICsvParsingService>();
 			_tempData = A.Fake<ITempDataDictionary>();
@@ -39,7 +37,7 @@ namespace CsvImportSite.Tests.ControllerTests
 			var indexViewModel = A.Fake<IndexViewModel>();
 			var employees = A.CollectionOfFake<Employee>(2);
 			A.CallTo(() => _employeeRepository.GetAllEmployeesAsync()).Returns(employees);
-			var controller = new HomeController(_logger, _employeeRepository, _csvParser, _mapper);
+			var controller = new HomeController(_employeeRepository, _csvParser, _mapper);
 			//Act
 			var result = await controller.Index();
 			//Assert
@@ -71,7 +69,7 @@ namespace CsvImportSite.Tests.ControllerTests
 			A.CallTo(() => _csvParser.ParseCsvFile(indexVMTakenRows.CsvFile)).Returns(employeesTaken);
 			A.CallTo(() => _employeeRepository.AddRangeAsync(employees)).Returns(true);
 			A.CallTo(() => _employeeRepository.AddRangeAsync(employeesTaken)).Throws(new DbUpdateException());
-			var controller = new HomeController(_logger, _employeeRepository, _csvParser, _mapper);
+			var controller = new HomeController(_employeeRepository, _csvParser, _mapper);
 			controller.TempData = _tempData;
 			//Act
 			var resultNormal = await controller.Index(indexVM);
@@ -95,7 +93,7 @@ namespace CsvImportSite.Tests.ControllerTests
 			Employee empNull = null;
 			A.CallTo(() => _employeeRepository.GetEmployeeByPayrollNumberAsyncNoTracking(idNormal)).Returns(employeeToEdit);
 			A.CallTo(() => _employeeRepository.GetEmployeeByPayrollNumberAsyncNoTracking(idEmpty)).Returns(empNull);
-			var controller = new HomeController(_logger, _employeeRepository, _csvParser, _mapper);
+			var controller = new HomeController(_employeeRepository, _csvParser, _mapper);
 			controller.TempData = _tempData;
 			//Act
 			var resultNormal = await controller.Edit(idNormal);
@@ -114,7 +112,7 @@ namespace CsvImportSite.Tests.ControllerTests
 			var employeeToEditError = A.Fake<Employee>();
 			A.CallTo(() => _employeeRepository.Update(employeeToEditOk)).Returns(true);
 			A.CallTo(() => _employeeRepository.Update(employeeToEditError)).Throws(new Exception("This is exception"));
-			var controller = new HomeController(_logger, _employeeRepository, _csvParser, _mapper);
+			var controller = new HomeController(_employeeRepository, _csvParser, _mapper);
 			controller.TempData = _tempData;
 			//Act
 			var resultNormal = controller.Edit(A.Dummy<string>(), employeeToEditOk);
@@ -138,21 +136,14 @@ namespace CsvImportSite.Tests.ControllerTests
 			var VMTaken = A.Fake<ChangePayrollNumberViewModel>();
 			VMTaken.Payroll_Number = "b";
 			VMTaken.NewPayroll_Number = "c";
-			var VMCanNotAdd = A.Fake<ChangePayrollNumberViewModel>();
-			VMCanNotAdd.Payroll_Number = "d";
-			var empCanNotAdd = A.Fake<Employee>();
 			A.CallTo(() => _employeeRepository.ExistsByPayrollNumberAsync(VMNormal.NewPayroll_Number)).Returns(false);
 			A.CallTo(() => _employeeRepository.ExistsByPayrollNumberAsync(VMTaken.NewPayroll_Number)).Returns(true);
-			A.CallTo(() => _employeeRepository.ExistsByPayrollNumberAsync(VMCanNotAdd.NewPayroll_Number)).Returns(false);
-			A.CallTo(() => _employeeRepository.GetEmployeeByPayrollNumberAsync(VMCanNotAdd.Payroll_Number)).Returns(empCanNotAdd);
-			A.CallTo(() => _employeeRepository.AddAsync(empCanNotAdd)).Throws(new Exception("a"));
-			var controller = new HomeController(_logger, _employeeRepository, _csvParser, _mapper);
+			var controller = new HomeController(_employeeRepository, _csvParser, _mapper);
 			controller.TempData = _tempData;
 			//Act
 			var resultNormal = await controller.ChangePayrollNumber(VMNormal);
 			var resultSameNumber = (ViewResult)(await controller.ChangePayrollNumber(VMSameNumber));
 			var resultTakenNumber = (ViewResult)(await controller.ChangePayrollNumber(VMTaken));
-			var resultAddError = (ViewResult)(await controller.ChangePayrollNumber(VMCanNotAdd));
 			//Assert
 			resultNormal.Should().NotBeNull();
 			resultNormal.Should().BeOfType(typeof(RedirectToActionResult));
@@ -160,8 +151,22 @@ namespace CsvImportSite.Tests.ControllerTests
 			resultSameNumber.ViewData.ModelState.Should().ContainKey("NewPayroll_Number");
 			resultTakenNumber.Should().NotBeNull();
 			resultTakenNumber.ViewData.ModelState.Should().ContainKey("DBConflictError");
-			resultAddError.Should().NotBeNull();
-			resultAddError.ViewData.ModelState.Should().ContainKey("AddError");
+		}
+		[Fact]
+		public async void EmployeeController_Delete_ReturnsReirectToAction()
+		{
+			//Arrange
+			var payrollNumberOk = "1";
+			var employeeOk = A.Fake<Employee>();
+			A.CallTo(() => _employeeRepository.GetEmployeeByPayrollNumberAsync(payrollNumberOk)).Returns(employeeOk);
+			A.CallTo(() => _employeeRepository.Delete(employeeOk)).Returns(true);
+			var controller = new HomeController(_employeeRepository, _csvParser, _mapper);
+			controller.TempData = _tempData;
+			//Act
+			var resultOk = (RedirectToActionResult)await controller.Delete(payrollNumberOk);
+			//Arrange
+			resultOk.Should().NotBeNull();
+			resultOk.Should().BeOfType(typeof(RedirectToActionResult));
 		}
 	}
 }

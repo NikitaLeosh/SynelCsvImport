@@ -1,16 +1,16 @@
 ﻿using CsvHelper.TypeConversion;
 using CsvHelper;
-using CsvImportSite.Configuration;
-using CsvImportSite.Data;
-using CsvImportSite.Interfaces;
-using CsvImportSite.Models;
-using CsvImportSite.ViewModels;
+using CsvImportSiteJS.Configuration;
+using CsvImportSiteJS.Data;
+using CsvImportSiteJS.Interfaces;
+using CsvImportSiteJS.Models;
+using CsvImportSiteJS.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace CsvImportSite.Services
+namespace CsvImportSiteJS.Services
 {
 	public class CsvParsingService : ICsvParsingService
 	{

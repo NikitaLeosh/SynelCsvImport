@@ -1,9 +1,9 @@
-﻿using CsvImportSite.Data;
+﻿using CsvImportSiteJS.Data;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace CsvImportSite.Models
+namespace CsvImportSiteJS.Models
 {
 	public class Employee
 	{

@@ -1,9 +1,9 @@
-﻿using CsvImportSite.Data;
-using CsvImportSite.Interfaces;
-using CsvImportSite.Models;
+﻿using CsvImportSiteJS.Data;
+using CsvImportSiteJS.Interfaces;
+using CsvImportSiteJS.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace CsvImportSite.Repositories
+namespace CsvImportSiteJS.Repositories
 {
 	public class EmployeeRepository : IEmployeeRepository
 	{

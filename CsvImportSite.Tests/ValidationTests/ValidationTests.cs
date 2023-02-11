@@ -1,12 +1,12 @@
-﻿using CsvImportSite.Data;
-using CsvImportSite.Models;
+﻿using CsvImportSiteJS.Data;
+using CsvImportSiteJS.Models;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace CsvImportSite.Tests.ModelTests
+namespace CsvImportSiteJS.Tests.ModelTests
 {
 	public class ValidationTests
 	{

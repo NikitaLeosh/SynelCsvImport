@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace CsvImportSite.Migrations
+namespace CsvImportSiteJS.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration

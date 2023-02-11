@@ -1,35 +1,81 @@
-﻿function hide_table_elements(table_id, visible) {
-    // Shows only the first `visible` table elements
-    table_elements = document.getElementById(table_id).children[1].children
+﻿var previousMax, currentPage;
 
-    for (const element of table_elements) {
-        if (visible == 0) {
+function hide_table_elements(table_id, currentPage, displayPerPage) {
+    // Shows only the table elements corresponding to the page.
+    table_elements = document.getElementById(table_id).children[1].querySelectorAll('tr:nth-child(n)');
+    var visibleMax = currentPage * displayPerPage;
+    var visibleMin = (currentPage - 1) * displayPerPage;
+    table_elements.forEach((element, index) => {
+        if (index >= visibleMax || index < visibleMin) {
             element.style.display = 'none'
         }
         else {
             element.style.display = 'table-row'
-            visible -= 1
         }
-    }
+    });
+};
+
+//const getCellValue = (row, index) => $(row).children('td').eq(index).text();
+function getCellValue(row, index) {
+    console.log(row.children[index], index);
+    return row.children[index].innerText || row.children[index].textContent;
 }
+const comparer = (idx, asc) => (a, b) => ((v1, v2) =>
+    v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
+)(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
 
-// Use below solution for <td> without `value` attribute
-const getCellValue = (tr, idx) => tr.children[idx].innerText.replace('$', '') || tr.children[idx].textContent.replace('$', '');
-/*const getCellValue = (tr, idx) => tr.children[idx].getAttribute('value')*/
 
-const comparer = (idx, asc) => (a, b) =>
-    ((v1, v2) => v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2))
-        (getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx))
-
-const reload_table = () => hide_table_elements('Employees', document.getElementById('form-select-employees').value)
+const reload_table = () => hide_table_elements('Employees', 1, document.getElementById('display-per-page').value)
 
 window.addEventListener('load', function () {
-    reload_table()
+    reload_table();
+    currentPage = 1;
+    var tableElements = document.getElementById('Employees').children[1].querySelectorAll('tr:nth-child(n)');
+    var paginationNumbers = document.getElementById('pagination-numbers');
+    //append page numbers to html
+    const appendPageNumbers = (current, max) => {
+        const pageNumber = document.createElement("div");
+        pageNumber.className = "pageNumber"
+        pageNumber.innerHTML = `page ${current} of ${max}`;
+        paginationNumbers.appendChild(pageNumber);
+    };
+    //count pages
+    const getPaginationNumbers = (current) => {
+        paginationNumbers.innerHTML = '';
+        var displayPerPage = document.getElementById('display-per-page').value;
+        var pageCount = Math.ceil(tableElements.length / displayPerPage);
+        appendPageNumbers(current, pageCount);
+
+    };
+    getPaginationNumbers(currentPage);
+
+    //next page
+    document.getElementById('next-button').addEventListener('click', function () {
+        var displayPerPage = document.getElementById('display-per-page').value;
+        var pageCount = Math.ceil(tableElements.length / displayPerPage);
+        if (currentPage < pageCount) {
+            currentPage++;
+            hide_table_elements('Employees', currentPage, displayPerPage);
+            getPaginationNumbers(currentPage);
+        }
+    })
+    //previous page
+    document.getElementById('prev-button').addEventListener('click', function () {
+        var displayPerPage = document.getElementById('display-per-page').value;
+        if (currentPage > 1) {
+            currentPage--;
+            hide_table_elements('Employees', currentPage, displayPerPage);
+            getPaginationNumbers(currentPage);
+
+        }
+    })
 
     // Show per page
-    document.getElementById('form-select-employees').addEventListener('change', function () {
+    document.getElementById('display-per-page').addEventListener('change', function () {
+        console.log('Check change!');
         counter = this.value
-        hide_table_elements('Employees', this.value)
+        hide_table_elements('Employees', 1, this.value)
+        getPaginationNumbers(currentPage);
     });
 
     // Search in table
@@ -55,14 +101,12 @@ window.addEventListener('load', function () {
         }
     });
 
-    // Sort table
+    //sort table
     document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
-        const table = document.getElementById('Employees').children[1]
-
-        Array.from(table.querySelectorAll('tr:nth-child(n)'))
-            .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
+        const table = document.getElementById('Employees').children[1];
+        Array.from(table.querySelectorAll(`tr`)).
+            sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
             .forEach(tr => table.appendChild(tr));
+    })))
 
-        reload_table()
-    })));
 });

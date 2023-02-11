@@ -1,4 +1,4 @@
-namespace CsvImportSite.Models
+namespace CsvImportSiteJS.Models
 {
 	public class ErrorViewModel
 	{
