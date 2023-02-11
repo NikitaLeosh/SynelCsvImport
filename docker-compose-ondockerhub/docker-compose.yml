@@ -1,0 +1,31 @@
+version: '3.4'
+
+networks:
+  csvimportsitjsenet:
+
+services:
+  csvimportjsdb:
+    container_name: csv-import-js-db
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+      - 8002:1433
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=1StrongPassword234@
+    networks:
+      - csvimportsitjsenet
+
+  csvimportsitejs:
+    container_name: csv-import-site-js
+    image: nikitaleosh/csvimportsitejs:latest
+    ports: 
+      - 8001:80
+    depends_on: 
+      - csvimportjsdb
+    environment:
+      - DB_HOST=csvimportjsdb
+      - DB_NAME=CsvImpostSitejsDb
+      - MSSQL_SA_PASSWORD=1StrongPassword234@
+      - MSSQL_PID=Standart
+    networks:
+      - csvimportsitjsenet
